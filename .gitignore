@@ -1,0 +1,40 @@
+# Build outputs
+*.exe
+*.obj
+*.pdb
+*.ilk
+*.exp
+*.lib
+
+# Build directories
+output/
+bin/
+obj/
+build/
+Release/
+Debug/
+x64/
+x86/
+
+# Visual Studio files
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.vcxproj
+*.vcxproj.filters
+*.sln
+
+# Distribution files
+*.zip
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# Temporary files
+*.tmp
+*.log
+*.bak
+*~
