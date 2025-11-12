@@ -4,9 +4,9 @@ A lightweight Windows utility that launches applications (PowerShell, CMD, VS Co
 
 ## Features
 
-- **Smart directory detection** - Automatically detects Explorer windows under cursor or in focus
+- **Smart directory detection** - Automatically detects Explorer windows under cursor or in focus (configurable, enable either or both and set precedence)
 - **Configurable hotkeys** - Set custom keyboard shortcuts for each application
-- **Multiple applications** - Launch PowerShell, CMD, Windows Terminal, VS Code, Git Bash, or any other app
+- **Multiple applications** - Launch PowerShell, CMD, Windows Terminal, VS Code, Git Bash, or any other app (configurable via GUI or .ini file)
 - **Admin support** - Optionally launch apps with administrator privileges
 - **INI configuration** - Simple text-based config file stored in AppData
 - **System tray** - Runs quietly in the background
@@ -292,6 +292,11 @@ Visit the [GitHub repository](https://github.com/agbrainerd/context-launcher) to
 MIT License - feel free to use and modify as needed. See LICENSE.txt for details.
 
 ## Changelog
+
+### v1.1.1
+- Fixed a bug where config editor was not launching from task bar menu
+- Added support for single-key shortcuts for e.g. F13-F24
+- Made quality of life updates to config editor
 
 ### v1.1.0
 - Config file now stored in AppData (no admin needed to edit settings)
