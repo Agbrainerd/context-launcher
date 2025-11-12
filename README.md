@@ -271,7 +271,7 @@ A: Yes, fully compatible with Windows 10 and 11.
 A: Only if the executable is in your PATH. Otherwise use full paths.
 
 **Q: How do I exit the listener?**
-A: Right-click the system tray icon (future enhancement), or use Task Manager.
+A: Right-click the system tray icon or use Task Manager.
 
 ## Contributing
 
