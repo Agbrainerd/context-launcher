@@ -3,12 +3,23 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
 namespace ContextLauncherConfig
 {
     public class ConfigEditor : Form
     {
+        // Win32 API for sending messages to launcher
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern bool PostMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
+
+        private const uint WM_USER = 0x0400;
+        private const uint WM_RELOAD_CONFIG = WM_USER + 100;
+
         private ListView appListView;
         private Button addButton;
         private Button editButton;
@@ -19,6 +30,8 @@ namespace ContextLauncherConfig
         private CheckBox checkFocusedWindowCheckBox;
         private ComboBox priorityComboBox;
         private string configFilePath;
+        private StatusStrip statusStrip;
+        private ToolStripStatusLabel statusLabel;
 
         public ConfigEditor()
         {
@@ -83,7 +96,7 @@ namespace ContextLauncherConfig
             appListView = new ListView
             {
                 Location = new Point(10, 140),
-                Size = new Size(760, 350),
+                Size = new Size(760, 330),
                 View = View.Details,
                 FullRowSelect = true,
                 GridLines = true,
@@ -134,8 +147,17 @@ namespace ContextLauncherConfig
                 isDoubleClickOnRow = false;
             };
 
+            // Status bar (replaces noisy MessageBox)
+            statusStrip = new StatusStrip();
+            statusLabel = new ToolStripStatusLabel("Ready")
+            {
+                Spring = true,
+                TextAlign = ContentAlignment.MiddleLeft
+            };
+            statusStrip.Items.Add(statusLabel);
+
             // Buttons
-            int buttonY = 500;
+            int buttonY = 480;
             addButton = new Button
             {
                 Text = "Add Application",
@@ -193,6 +215,38 @@ namespace ContextLauncherConfig
             this.Controls.Add(deleteButton);
             this.Controls.Add(saveButton);
             this.Controls.Add(launchButton);
+            this.Controls.Add(statusStrip);
+        }
+
+        private void ShowStatus(string message, bool isError = false)
+        {
+            statusLabel.Text = message;
+            statusLabel.ForeColor = isError ? Color.Red : Color.DarkGreen;
+            
+            // Auto-clear after 3 seconds
+            System.Threading.Tasks.Task.Delay(3000).ContinueWith(_ => 
+            {
+                if (statusLabel.GetCurrentParent() != null)
+                {
+                    if (this.InvokeRequired)
+                        this.Invoke(new Action(() => statusLabel.Text = "Ready"));
+                    else
+                        statusLabel.Text = "Ready";
+                }
+            });
+        }
+
+        private void NotifyLauncherToReload()
+        {
+            // Find the launcher window
+            IntPtr hwnd = FindWindow("LauncherWindowClass", "Launcher");
+            
+            if (hwnd != IntPtr.Zero)
+            {
+                // Send reload message
+                PostMessage(hwnd, WM_RELOAD_CONFIG, IntPtr.Zero, IntPtr.Zero);
+            }
+            // If launcher not running, that's okay - it will load fresh config when started
         }
 
         private void LoadConfig()
@@ -278,7 +332,7 @@ namespace ContextLauncherConfig
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error loading config: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ShowStatus($"Error loading config: {ex.Message}", true);
                 LoadDefaultApps();
             }
         }
@@ -400,11 +454,15 @@ namespace ContextLauncherConfig
                     }
                 }
 
-                MessageBox.Show("Configuration saved successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                // Notify launcher to reload configuration
+                NotifyLauncherToReload();
+                
+                // Show quiet status message instead of noisy MessageBox
+                ShowStatus("Configuration saved and applied");
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error saving config: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ShowStatus($"Error saving config: {ex.Message}", true);
             }
         }
 
@@ -453,16 +511,16 @@ namespace ContextLauncherConfig
                 if (File.Exists(launcherPath))
                 {
                     System.Diagnostics.Process.Start(launcherPath);
-                    MessageBox.Show("Context Launcher has been started!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    ShowStatus("Context Launcher started successfully");
                 }
                 else
                 {
-                    MessageBox.Show("Could not find context-launcher.exe in the installation directory.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    ShowStatus("Could not find context-launcher.exe", true);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error starting launcher: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ShowStatus($"Error starting launcher: {ex.Message}", true);
             }
         }
 

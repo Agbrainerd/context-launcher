@@ -2,7 +2,7 @@
 ; Download Inno Setup from: https://jrsoftware.org/isinfo.php
 
 #define MyAppName "Context Launcher"
-#define MyAppVersion "1.1.0"
+#define MyAppVersion "1.1.1"
 #define MyAppPublisher "Audrey Brainerd"
 #define MyAppURL "https://github.com/agbrainerd/context-launcher"
 #define MyAppExeName "context-launcher.exe"
