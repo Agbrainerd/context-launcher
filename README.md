@@ -236,19 +236,6 @@ The error message will list which specific hotkeys failed. This means another ap
 
 ## Advanced Usage
 
-### Integration with Other Tools
-Call the launcher from scripts or other applications:
-```batch
-start context-launcher.exe --oneshot
-```
-
-### AutoHotkey Integration
-```ahk
-^!p::  ; Ctrl+Alt+P
-    Run, context-launcher.exe --oneshot
-return
-```
-
 ### Startup on Login
 The installer provides an option to "Run at Windows startup". If you didn't select it during installation:
 
@@ -259,7 +246,6 @@ The installer provides an option to "Run at Windows startup". If you didn't sele
 ## FAQ
 
 **Q: Does this work with network drives?**
-A: Yes, as long as the network drive is mounted and accessible in Explorer.
 
 **Q: Can I launch apps that require parameters?**
 A: Yes, use the `args` field in the config.
